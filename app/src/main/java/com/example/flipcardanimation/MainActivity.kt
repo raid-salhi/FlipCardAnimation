@@ -3,6 +3,8 @@ package com.example.flipcardanimation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +41,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.flipcardanimation.ui.theme.FlipCardAnimationTheme
+import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +69,12 @@ fun FlippingCard(){
     var rotated by remember {
         mutableStateOf(false)
     }
+    val rotate by animateFloatAsState(
+        targetValue = if (rotated) 180f else 0f,
+        animationSpec = tween(600)
+    )
+
+
 
     Card (
         shape = RoundedCornerShape(30.dp),
@@ -70,23 +82,38 @@ fun FlippingCard(){
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
             .padding(10.dp)
-            .heightIn(300.dp)
+            .height(320.dp)
+            .graphicsLayer {
+                rotationY = rotate
+                cameraDistance = 10 * density
+
+            }
             .fillMaxWidth()
     ){
-        if (!rotated)
+
+        if (!rotated){
             CardFace {
+
                 rotated = !rotated
             }
+        }
         else
-            CardTale {
+            CardTale(rotate) {
                 rotated = !rotated
             }
     }
 }
 
 @Composable
-fun CardTale(onClick: () -> Unit) {
-    Column(modifier = Modifier.fillMaxSize().clickable { onClick.invoke() }) {
+fun CardTale(rotate:Float,onClick: () -> Unit) {
+
+
+
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .clickable { onClick.invoke() })
+    {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -99,18 +126,27 @@ fun CardTale(onClick: () -> Unit) {
             color = Color(0xff0F0F0F),
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
-            modifier = Modifier.padding( 10.dp).fillMaxWidth().background(Color.White),
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .graphicsLayer {
+                    rotationY = rotate
+                }
+                .background(Color.White),
             )
     }
 }
 
 @Composable
 fun CardFace(onClick: () -> Unit) {
+
+
     Box(
         Modifier
             .fillMaxWidth()
             .clickable { onClick.invoke() }
     ) {
+
         Image(
             painter = painterResource(id = R.drawable.circles),
             contentDescription = "circles",

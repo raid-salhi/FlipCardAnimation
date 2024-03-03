@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,11 +14,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,29 +63,54 @@ fun FlippingCard(){
     var rotated by remember {
         mutableStateOf(false)
     }
+
     Card (
         shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xffEFEFEF)),
         elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
         modifier = Modifier
             .padding(10.dp)
+            .heightIn(300.dp)
             .fillMaxWidth()
     ){
-        if (rotated)
-            CardFace()
+        if (!rotated)
+            CardFace {
+                rotated = !rotated
+            }
         else
-            CardTale()
+            CardTale {
+                rotated = !rotated
+            }
     }
 }
 
 @Composable
-fun CardTale() {
-    TODO("Not yet implemented")
+fun CardTale(onClick: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().clickable { onClick.invoke() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .background(Color(0xff0F0F0F))
+
+        )
+        Text(
+            text = "123",
+            color = Color(0xff0F0F0F),
+            fontSize = 16.sp,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.padding( 10.dp).fillMaxWidth().background(Color.White),
+            )
+    }
 }
 
 @Composable
-fun CardFace() {
-    Box(Modifier.fillMaxWidth()) {
+fun CardFace(onClick: () -> Unit) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .clickable { onClick.invoke() }
+    ) {
         Image(
             painter = painterResource(id = R.drawable.circles),
             contentDescription = "circles",

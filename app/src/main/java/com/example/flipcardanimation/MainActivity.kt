@@ -71,7 +71,7 @@ fun FlippingCard(){
         animationSpec = tween(600), label = ""
     )
     val rotateText by animateFloatAsState(
-        targetValue = if (rotated) 180f else 0f,
+        targetValue = 180f
     )
     Card (
         shape = RoundedCornerShape(30.dp),

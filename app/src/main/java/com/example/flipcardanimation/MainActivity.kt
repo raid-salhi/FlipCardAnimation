@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
                     color = Color.DarkGray
                 ) {
                    Column(verticalArrangement = Arrangement.Center) {
+                       // We separated the main code in this FlippingCard composable func
                        FlippingCard()
                    }
                 }
@@ -63,16 +64,20 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun FlippingCard(){
+
+    // this boolean indicates the state of the card if it is in the face or the tale
     var rotated by remember {
         mutableStateOf(false)
     }
+
+    // this float state is the one responsible of flipping (animating) our card from 0 degree to 180 degree or the opposite
     val rotate by animateFloatAsState(
         targetValue = if (rotated) 180f else 0f,
-        animationSpec = tween(600), label = ""
+        // we specify the animation duration to 0.6 sec
+        animationSpec = tween(600),
     )
-    val rotateText by animateFloatAsState(
-        targetValue = 180f
-    )
+
+    // this is the card container ui code
     Card (
         shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xffEFEFEF)),
@@ -80,46 +85,53 @@ fun FlippingCard(){
         modifier = Modifier
             .padding(10.dp)
             .height(320.dp)
+            // graphicsLayer is a modifier's method which is the one responsible for applying various effect to the content
+            // we're going to apply the rotation effect (flipping the card)
             .graphicsLayer {
+                // we'll rotate the card on the horizontal axis using the float state we created
                 rotationY = rotate
+                // this line is to reduce the zoom-in effect
                 cameraDistance = 10 * density
-
             }
             .fillMaxWidth()
     ){
 
-        if (rotate < 90f){
-
+        // here ww are checking if the rotation value is less than 90 degree, means the face must be visible
+        // else we show the tale
+        if (rotate < 90f)
             CardFace {
+                // when onclick method is triggered we change the rotated boolean value to indicates that we're changing the tale
+                // when the boolean value change it will trigger the float state that it responsible of the rotation
                 rotated = !rotated
             }
-        }
-        else {
 
-            CardTale(rotateText=rotateText) {
+        else
+            CardTale {
+                // when onclick method is triggered we rotate the card from tale to face
                 rotated = !rotated
             }
-        }
+
 
     }
 }
-
+// Card Tale ui design
 @Composable
-fun CardTale(rotateText: Float, onClick: () -> Unit) {
+fun CardTale( onClick: () -> Unit) {
 
+    // this val is responsible for eliminating the mirror effect applied when going from card face to card tale
+    val rotateText = 180f
 
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .clickable { onClick.invoke() })
-    {
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            // we invoke onclick method when we click on the card
+            .clickable { onClick.invoke() }
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
                 .background(Color(0xff0F0F0F))
-
         )
         Text(
             text = "123",
@@ -129,22 +141,23 @@ fun CardTale(rotateText: Float, onClick: () -> Unit) {
             modifier = Modifier
                 .padding(10.dp)
                 .fillMaxWidth()
+                // here we prevent the mirror effect applied on the text caused by the rotation
                 .graphicsLayer {
                     rotationY = rotateText
-                    cameraDistance = 10 * density
                 }
                 .background(Color.White),
             )
     }
 }
 
+// Card face ui design
 @Composable
 fun CardFace(onClick: () -> Unit) {
-
 
     Box(
         Modifier
             .fillMaxWidth()
+            // we invoke onclick method when we click on the card
             .clickable { onClick.invoke() }
     ) {
 
